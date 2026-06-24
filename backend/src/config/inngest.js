@@ -1,8 +1,12 @@
 import { Inngest } from "inngest";
 import { connectDB } from "../config/db.js";
 import { User } from "../models/user.model.js";
+import { ENV } from "./env.js";
 
-export const inngest = new Inngest({ id: "slack-clone" });
+export const inngest = new Inngest({
+    id: "slack-clone",
+    signingKey: ENV.INNGEST_SIGNING_KEY
+});
 
 const syncUser = inngest.createFunction(
     {
