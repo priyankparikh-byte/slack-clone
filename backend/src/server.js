@@ -7,9 +7,9 @@ import { serve } from "inngest/express"
 
 
 const app = express();
-app.use(clerkMiddleware());
 app.use(express.json());
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use(clerkMiddleware());
 app.get("/", (req, res) => {
     res.send("hello world");
 })
