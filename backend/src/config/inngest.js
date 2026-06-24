@@ -1,5 +1,6 @@
 import { Inngest } from "inngest";
-import { conncetDB } from "../config/db.js";
+import { connectDB } from "../config/db.js";
+import { User } from "../models/user.model.js";
 
 export const inngest = new Inngest({ id: "slack-clone" });
 
@@ -7,15 +8,15 @@ const syncUser = inngest.createFunction(
     { id: "sync-user" },
     { event: "clerk/user.created" },
     async ({ event }) => {
-        await conncetDB()
+        await connectDB();
 
-        const { id, email, first_name, last_name, iamge_url } = event.data;
+        const { id, email_addresses, first_name, last_name, iamge_url } = event.data;
 
         const newUser = {
             clerkId: id,
             email: email_addresses[0]?.email_address,
             name: `${first_name} ${last_name}`,
-            image: image_url,
+            image: iamge_url,
 
         }
 
@@ -27,7 +28,7 @@ const deleteUserFromDb = inngest.createFunction(
     { id: "deleteUserFromDb" },
     { event: "clerk/user.deleted" },
     async ({ event }) => {
-
+        await connectDB();
         const { id } = event.data;
 
         await User.deleteOne({ clerkId: id });
