@@ -14,19 +14,27 @@ const syncUser = inngest.createFunction(
         triggers: { event: "clerk/user.created" }
     },
     async ({ event }) => {
-        await connectDB();
+        try {
+            await connectDB();
+            console.log("Received Clerk user.created event:", JSON.stringify(event.data, null, 2));
 
-        const { id, email_addresses, first_name, last_name, image_url } = event.data;
+            const { id, email_addresses, first_name, last_name, image_url } = event.data;
 
-        const newUser = {
-            clerkId: id,
-            email: email_addresses[0]?.email_address,
-            name: `${first_name} ${last_name}`,
-            image: image_url,
+            const newUser = {
+                clerkId: id,
+                email: email_addresses[0]?.email_address,
+                name: `${first_name} ${last_name}`,
+                image: image_url,
+            }
 
+            console.log("Creating user:", newUser);
+            const savedUser = await User.create(newUser);
+            console.log("User saved successfully:", savedUser);
+            return { success: true, userId: savedUser._id };
+        } catch (error) {
+            console.error("Error in syncUser:", error);
+            throw error;
         }
-
-        await User.create(newUser)
     }
 )
 
